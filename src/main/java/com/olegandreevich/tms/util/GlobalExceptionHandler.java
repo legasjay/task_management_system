@@ -48,6 +48,18 @@ public class GlobalExceptionHandler {
         }
         return new ApiError(HttpStatus.BAD_REQUEST.value(), sb.toString());
     }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        return new ApiError(HttpStatus.CONFLICT.value(), ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ApiError handleInvalidPasswordException(InvalidPasswordException ex) {
+        return new ApiError(HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage());
+    }
 }
 
 
