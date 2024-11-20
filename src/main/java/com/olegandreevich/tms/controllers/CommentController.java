@@ -37,8 +37,4 @@ public class CommentController {
         commentService.deleteComment(commentId);
     }
 
-//    @GetMapping("/all")
-//    public List<CommentDTO> findAll() {
-//        return commentService.findAll();
-//    }
 }
