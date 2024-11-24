@@ -33,4 +33,4 @@ ALTER TABLE comments ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES use
 
 -- V1_0_2__create_admin.sql
 INSERT INTO users (id, email, username, password, role)
-VALUES (1, 'admin@example.com', 'admin', '$2y$12$xKqRrH4b5fXlI6N4gW9QeCJvXG6zBmxO7PZ1tvyAUKb9d1U3M9O6', 'ADMIN');
+VALUES (1, 'admin@example.com', 'admin', 'admin', 'ADMIN');

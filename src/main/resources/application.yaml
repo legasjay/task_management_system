@@ -1,6 +1,6 @@
 app:
   jwtSecret: 'my_secret_key'  # замените my_secret_key на реальный секретный ключ
-  jwtExpirationInMs: 36000000  # срок жизни токена в миллисекундах (в данном примере 1 час)
+  jwtExpirationInMs: 3600000  # срок жизни токена в миллисекундах (в данном примере 1 час) 3 600 000
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5445/task_management

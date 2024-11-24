@@ -2,8 +2,10 @@ package com.olegandreevich.tms.dto;
 
 import com.olegandreevich.tms.entities.enums.Priority;
 import com.olegandreevich.tms.entities.enums.Status;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class TaskDTOGet {
     private Long id;

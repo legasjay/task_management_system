@@ -16,8 +16,6 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private long jwtExpirationInMs;
 
-    /** * Генерирует JWT-токен для переданного имени пользователя. * *
-     * @param username Имя пользователя. * @return JWT-токен. */
     public String generateToken(String username) {
         try {
             Algorithm algorithm = Algorithm.HMAC512(jwtSecret);
@@ -31,8 +29,6 @@ public class JwtTokenProvider {
         }
     }
 
-    /** * Извлекает имя пользователя из JWT-токена. * *
-     * @param token JWT-токен. * @return Имя пользователя. */
     public String getUsernameFromJWT(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC512(jwtSecret);
@@ -46,8 +42,6 @@ public class JwtTokenProvider {
         }
     }
 
-    /** * Проверяет, является ли JWT-токен действительным. * * @param token JWT-токен. *
-     * @return true, если токен действителен; false в противном случае. */
     public boolean isTokenValid(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC512(jwtSecret);
