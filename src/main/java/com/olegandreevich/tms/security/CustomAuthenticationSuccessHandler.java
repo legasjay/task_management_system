@@ -29,16 +29,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        String username = authentication.getName(); // Получаем имя пользователя из контекста аутентификации
-        String jwt = tokenProvider.generateToken(username); // Генерируем JWT-токен
+        String username = authentication.getName();
+        String jwt = tokenProvider.generateToken(username);
 
         Cookie cookie = new Cookie("accessToken", jwt);
-        cookie.setPath("/"); // Доступен для всего домена
-        cookie.setSecure(true); // Только через HTTPS
-        cookie.setMaxAge((int) jwtExpirationInMs / 1000); // Срок действия токена
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setMaxAge((int) jwtExpirationInMs / 1000);
+
         response.addCookie(cookie);
 
-        // Перенаправляем на Swagger UI
         response.sendRedirect("/swagger-ui.html");
     }
 }

@@ -12,5 +12,4 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentDTO {
     private String content;
-//    private LocalDateTime createdAt; // can be omitted if not needed in the response
 }

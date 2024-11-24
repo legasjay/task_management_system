@@ -23,8 +23,8 @@ public class TaskController {
     public List<TaskDTOGet> getTasks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @RequestParam(defaultValue = "id") String sortField
     ) {
         return taskService.getTasks(page, size, direction, sortField).getContent();
     }

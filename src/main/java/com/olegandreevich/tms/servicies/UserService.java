@@ -71,4 +71,9 @@ public class UserService {
         user.demoteToUser();
         userRepository.save(user);
     }
+
+    public void updatePassword(String username, String plainTextPassword) {
+        String encodedPassword = passwordEncoder.encode(plainTextPassword);
+        userRepository.updatePassword(encodedPassword, username);
+    }
 }
