@@ -1,5 +1,6 @@
 package com.olegandreevich.tms.util;
 
+import com.olegandreevich.tms.util.exceptions.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

@@ -2,7 +2,7 @@ package com.olegandreevich.tms.controllers;
 
 import com.olegandreevich.tms.dto.CommentDTO;
 import com.olegandreevich.tms.servicies.CommentService;
-import com.olegandreevich.tms.util.ResourceNotFoundException;
+import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,5 +36,4 @@ public class CommentController {
     public void deleteComment(@PathVariable Long commentId) throws ResourceNotFoundException {
         commentService.deleteComment(commentId);
     }
-
 }

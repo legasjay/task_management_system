@@ -1,4 +1,4 @@
-package com.olegandreevich.tms.util;
+package com.olegandreevich.tms.util.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

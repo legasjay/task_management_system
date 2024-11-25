@@ -25,12 +25,12 @@ CREATE TABLE comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- V1_0_1__add_foreign_keys.sql
+-- add_foreign_keys.sql
 ALTER TABLE tasks ADD CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id);
 ALTER TABLE tasks ADD CONSTRAINT fk_assignee FOREIGN KEY (assignee_id) REFERENCES users(id);
 ALTER TABLE comments ADD CONSTRAINT fk_task FOREIGN KEY (task_id) REFERENCES tasks(id);
 ALTER TABLE comments ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id);
 
--- V1_0_2__create_admin.sql
+-- create_admin.sql
 INSERT INTO users (id, email, username, password, role)
 VALUES (1, 'admin@example.com', 'admin', 'admin', 'ADMIN');
