@@ -8,7 +8,7 @@ import com.olegandreevich.tms.mappers.TaskMapper;
 import com.olegandreevich.tms.mappers.TaskMapperGet;
 import com.olegandreevich.tms.repositories.TaskRepository;
 import com.olegandreevich.tms.repositories.UserRepository;
-import com.olegandreevich.tms.util.ResourceNotFoundException;
+import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

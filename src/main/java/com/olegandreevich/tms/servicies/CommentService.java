@@ -6,7 +6,7 @@ import com.olegandreevich.tms.entities.Task;
 import com.olegandreevich.tms.entities.User;
 import com.olegandreevich.tms.mappers.CommentMapper;
 import com.olegandreevich.tms.repositories.CommentRepository;
-import com.olegandreevich.tms.util.ResourceNotFoundException;
+import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
