@@ -1,5 +1,6 @@
 package com.olegandreevich.tms.controllers;
 
+import com.olegandreevich.tms.entities.enums.Role;
 import com.olegandreevich.tms.security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,19 +41,23 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.generateToken(loginRequest.email());
+        String jwt = tokenProvider.generateToken(loginRequest.email(), loginRequest.role);
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", jwt);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public record LoginRequest(String email, String password) {
+    public record LoginRequest(String email, String password, Role role) {
         public String email() {
             return email;
         }
 
         public String password() {
             return password;
+        }
+
+        public Role role(){
+            return role;
         }
     }
 }

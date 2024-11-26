@@ -1,5 +1,6 @@
 package com.olegandreevich.tms.security;
 
+import com.olegandreevich.tms.entities.enums.Role;
 import com.olegandreevich.tms.servicies.UserDetailsServiceTMS;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,12 +8,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -35,7 +39,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwt) {
         String username = tokenProvider.getUsernameFromJWT(jwt);
-        UserDetailsTMS userDetails = (UserDetailsTMS) userDetailsServiceTMS.loadUserByUsername(username);
+        Role role = tokenProvider.getRoleFromJWT(jwt);
+
+        // Создаем список ролей на основе информации из JWT
+        List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(role.name()));
+
+        // Создаем объект UserDetails с полученными данными
+        UserDetailsTMS userDetails = new UserDetailsTMS(username, "", authorities);
+
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
