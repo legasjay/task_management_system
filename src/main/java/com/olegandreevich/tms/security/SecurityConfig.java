@@ -48,9 +48,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/users/register").permitAll()
                         // Регистрация доступна всем
-                        .requestMatchers("/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users").hasRole("ADMIN")
                         // Просмотр всех пользователей доступен только админу
-                        .requestMatchers("/api/users/{userId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users/{userId}").hasRole("ADMIN")
                         // Просмотр отдельного пользователя доступен только админу
                         .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyRole("USER", "ADMIN")
                         // Получение списка задач доступно пользователям и админам
@@ -72,11 +72,9 @@ public class SecurityConfig {
                                 .successHandler(customAuthenticationSuccessHandler)
                                                     // Указываем наш кастомный обработчик успеха
                                 .failureUrl("/login-error")
-                                .permitAll()
-                )
-                .addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                .permitAll())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

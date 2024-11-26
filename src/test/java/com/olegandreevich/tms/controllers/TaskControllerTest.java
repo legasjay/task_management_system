@@ -16,9 +16,6 @@ import com.olegandreevich.tms.entities.User;
 import com.olegandreevich.tms.entities.enums.Priority;
 import com.olegandreevich.tms.entities.enums.Role;
 import com.olegandreevich.tms.entities.enums.Status;
-import com.olegandreevich.tms.mappers.TaskMapper;
-import com.olegandreevich.tms.mappers.TaskMapperGet;
-import com.olegandreevich.tms.repositories.UserRepository;
 import com.olegandreevich.tms.servicies.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,9 +44,9 @@ class TaskControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     // Моки пользователей
-    User user1 = new User(1L, "111@mail.ru", "user1", "pass", Role.ADMIN, null, null);
-    User user2 = new User(2L, "222@mail.ru", "user2", "pass", Role.USER, null, null);
-    User user3 = new User(3L, "333@mail.ru", "user3", "pass", Role.USER, null, null);
+    User user1 = new User(1L, "111@mail.ru", "user1", "pass", Role.ROLE_ADMIN, null, null);
+    User user2 = new User(2L, "222@mail.ru", "user2", "pass", Role.ROLE_USER, null, null);
+    User user3 = new User(3L, "333@mail.ru", "user3", "pass", Role.ROLE_USER, null, null);
 
     // Моки задач
     Task task1 = new Task(1L, "title1", "desc1", Status.PENDING, Priority.HIGH, user1, user1, new ArrayList<>());
