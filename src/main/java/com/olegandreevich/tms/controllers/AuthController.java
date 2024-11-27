@@ -32,8 +32,7 @@ public class AuthController {
     @PostMapping("/token")
     public ResponseEntity<Map<String, String>> generateToken(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password())
-        );
+                new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
 
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new BadCredentialsException("Неверная почта или пароль.");

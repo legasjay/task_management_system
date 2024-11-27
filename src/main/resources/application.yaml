@@ -6,3 +6,12 @@ spring:
     url: jdbc:postgresql://localhost:5445/task_management
     username: postgres
     password: postgres
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+    com:
+      example:
+        security:
+          JwtAuthenticationFilter: DEBUG

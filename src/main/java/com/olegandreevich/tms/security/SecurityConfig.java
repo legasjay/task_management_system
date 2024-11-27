@@ -48,19 +48,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/users/register").permitAll()
                         // Регистрация доступна всем
-                        .requestMatchers(HttpMethod.GET,"/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users").hasAuthority("ADMIN")
                         // Просмотр всех пользователей доступен только админу
-                        .requestMatchers(HttpMethod.GET,"/api/users/{userId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users/{userId}").hasAuthority("ADMIN")
                         // Просмотр отдельного пользователя доступен только админу
-                        .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyAuthority("USER", "ADMIN")
                         // Получение списка задач доступно пользователям и админам
-                        .requestMatchers(HttpMethod.POST, "/api/tasks").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/tasks").hasAnyAuthority("USER", "ADMIN")
                         // Создание новой задачи доступно пользователям и админам
-                        .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}").hasAnyAuthority("USER", "ADMIN")
                         // Редактирование задачи доступно пользователям и админам
-                        .requestMatchers(HttpMethod.DELETE, "/api/tasks/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tasks/{id}").hasAuthority("ADMIN")
                         // Удаление задачи доступно только админу
-                        .requestMatchers("/api/tasks/{taskId}/comments").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/tasks/{taskId}/comments").hasAnyAuthority("USER", "ADMIN")
                         // Комментарии доступны пользователям и админам
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").authenticated()
                         // Разрешить доступ к Swagger UI только аутентифицированным пользователям
