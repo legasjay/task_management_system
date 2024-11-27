@@ -8,15 +8,23 @@ import com.olegandreevich.tms.mappers.TaskMapper;
 import com.olegandreevich.tms.mappers.TaskMapperGet;
 import com.olegandreevich.tms.repositories.TaskRepository;
 import com.olegandreevich.tms.repositories.UserRepository;
+import com.olegandreevich.tms.security.UserDetailsTMS;
 import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +35,55 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final TaskMapperGet taskMapperGet;
     private final UserRepository userRepository;
+
+    private static final String CURRENT_USER_ID_CACHE_KEY = "current_user_id";
+    private Long cachedUserId;
+
+    @PostConstruct
+    public void init() {
+        this.cachedUserId = null;
+    }
+
+    @Cacheable(value = CURRENT_USER_ID_CACHE_KEY)
+    private Long getCurrentUserId() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetailsTMS) {
+            String username = ((UserDetailsTMS) principal).getUsername();
+
+            try {
+                Optional<User> optionalUser = userRepository.findByEmail(username);
+
+                if (optionalUser.isPresent()) {
+                    return optionalUser.get().getId();
+                } else {
+                    throw new RuntimeException("Пользователь с таким email не найден.");
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Ошибка при получении текущего ID пользователя.", e);
+            }
+        }
+
+        throw new RuntimeException("Не удалось получить текущий ID пользователя.");
+    }
+
+    public Long getCachedUserId() {
+        if (cachedUserId == null) {
+            cachedUserId = getCurrentUserId();
+        }
+        return cachedUserId;
+    }
+
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private boolean isTaskAssignee(Task task) {
+        Long currentUserId = getCurrentUserId();
+        return Objects.equals(currentUserId, task.getAssignee().getId());
+    }
 
     public Page<TaskDTOGet> getTasks(int page, int size, Sort.Direction direction, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, direction, sortField);
@@ -72,12 +129,22 @@ public class TaskService {
     }
 
     public List<TaskDTO> findTasksByAuthorId(Long authorId) {
+        Long currentUserId = getCachedUserId();
+        if (!authorId.equals(currentUserId) && !isAdmin()) {
+            throw new AccessDeniedException("Доступ запрещен.");
+        }
+
         return taskRepository.findByAuthor_Id(authorId).stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public List<TaskDTO> findTasksByAssigneeId(Long assigneeId) {
+        Long currentUserId = getCachedUserId();
+        if (!assigneeId.equals(currentUserId) && !isAdmin()) {
+            throw new AccessDeniedException("Доступ запрещен.");
+        }
+
         return taskRepository.findByAssignee_Id(assigneeId).stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
