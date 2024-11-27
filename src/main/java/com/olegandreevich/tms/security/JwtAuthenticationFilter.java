@@ -41,10 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = tokenProvider.getUsernameFromJWT(jwt);
         Role role = tokenProvider.getRoleFromJWT(jwt);
 
-        // Создаем список ролей на основе информации из JWT
         List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(role.name()));
 
-        // Создаем объект UserDetails с полученными данными
         UserDetailsTMS userDetails = new UserDetailsTMS(username, "", authorities);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
