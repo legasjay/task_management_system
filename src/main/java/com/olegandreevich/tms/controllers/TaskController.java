@@ -61,4 +61,9 @@ public class TaskController {
     public List<TaskDTO> findTasksByAssigneeId(@PathVariable Long assigneeId) {
         return taskService.findTasksByAssigneeId(assigneeId);
     }
+
+    @PutMapping("/{id}/{status}")
+    public TaskDTOGet changeTaskStatus(@PathVariable Long id, @PathVariable String status) {
+        return taskService.changeTaskStatus(id, status);
+    }
 }
