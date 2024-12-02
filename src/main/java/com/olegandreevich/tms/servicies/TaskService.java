@@ -4,6 +4,7 @@ import com.olegandreevich.tms.dto.TaskDTO;
 import com.olegandreevich.tms.dto.TaskDTOGet;
 import com.olegandreevich.tms.entities.Task;
 import com.olegandreevich.tms.entities.User;
+import com.olegandreevich.tms.entities.enums.Status;
 import com.olegandreevich.tms.mappers.TaskMapper;
 import com.olegandreevich.tms.mappers.TaskMapperGet;
 import com.olegandreevich.tms.repositories.TaskRepository;
@@ -86,6 +87,9 @@ public class TaskService {
     }
 
     public Page<TaskDTOGet> getTasks(int page, int size, Sort.Direction direction, String sortField) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для изменения статуса этой задачи.");
+        }
         PageRequest pageRequest = PageRequest.of(page, size, direction, sortField);
         return taskRepository.findAll(pageRequest).map(taskMapperGet::toDto);
     }
@@ -123,9 +127,13 @@ public class TaskService {
     }
 
     public TaskDTO getTaskById(Long id) throws ResourceNotFoundException {
-        Task task = taskRepository.findById(id)
+        Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
-        return taskMapper.toDto(task);
+
+        if (!isTaskAssignee(existingTask) && !isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для изменения статуса этой задачи.");
+        }
+        return taskMapper.toDto(existingTask);
     }
 
     public List<TaskDTO> findTasksByAuthorId(Long authorId) {
@@ -148,5 +156,26 @@ public class TaskService {
         return taskRepository.findByAssignee_Id(assigneeId).stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+
+    public TaskDTOGet changeTaskStatus(Long id, String status) throws ResourceNotFoundException {
+        Task existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+
+        if (!isTaskAssignee(existingTask) && !isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для изменения статуса этой задачи.");
+        }
+
+        try {
+            Status newStatus = Status.valueOf(status);
+            existingTask.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Неверное значение статуса: " + status);
+        }
+
+        Task updatedTask = taskRepository.save(existingTask);
+
+        return taskMapperGet.toDto(updatedTask);
     }
 }
