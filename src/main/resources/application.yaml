@@ -6,6 +6,10 @@ spring:
     url: jdbc:postgresql://localhost:5445/task_management
     username: postgres
     password: postgres
+springdoc:
+  api-docs:
+    enabled: true
+  packages-to-scan: com.olegandreevich.tms.controllers
 logging:
   level:
     org:

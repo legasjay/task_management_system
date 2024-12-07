@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/** * Сервис для работы с комментариями. * Предоставляет методы для добавления, получения и удаления комментариев. */
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -23,6 +24,10 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final ModelMapper modelMapper;
 
+    /** * Добавляет новый комментарий к задаче. * * @param taskId ID задачи, к которой добавляется комментарий.
+     * @param userId ID пользователя, оставившего комментарий. * @param commentDTO DTO объекта комментария
+     *               для добавления. * @return DTO добавленного комментария. * @throws ResourceNotFoundException
+     *               если задача или пользователь не найдены. */
     public CommentDTO addComment(Long taskId, Long userId, CommentDTO commentDTO) throws ResourceNotFoundException {
         Comment comment = commentMapper.toEntity(commentDTO);
         comment.setTask(new Task(taskId)); // Assume you have a method to fetch Task by ID
@@ -31,6 +36,8 @@ public class CommentService {
         return commentMapper.toDto(savedComment);
     }
 
+    /** * Возвращает список комментариев для указанной задачи. * * @param taskId ID задачи,
+     * для которой возвращаются комментарии. * @return Список DTO комментариев. */
     @Transactional(readOnly = true)
     public List<CommentDTO> getCommentsForTask(Long taskId) {
         return commentRepository.findAll()
@@ -40,11 +47,14 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    /** * Удаляет комментарий по указанному ID. * * @param id ID комментария для удаления.
+     * @throws ResourceNotFoundException если комментарий с указанным ID не найден. */
     @Transactional
     public void deleteComment(Long id) throws ResourceNotFoundException {
         commentRepository.deleteById(id);
     }
 
+    /** * Возвращает список всех комментариев. * * @return Список DTO всех комментариев. */
     public List<CommentDTO> findAll() {
         return commentRepository.findAll()
                 .stream()

@@ -16,44 +16,77 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+/** * Фильтр для проверки и обработки JWT-токена в каждом запросе. */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    /** * Сервис для получения деталей пользователя. */
     @Autowired
     private UserDetailsServiceTMS userDetailsServiceTMS;
 
+    /** * Провайдер для работы с JWT-токенами. */
     @Autowired
     private JwtTokenProvider tokenProvider;
 
+    /** * Основной метод фильтрации запроса. *
+     * @param request HTTP-запрос.
+     * @param response HTTP-ответ.
+     * @param filterChain цепочка фильтров.
+     * @throws ServletException исключение сервлета.
+     * @throws IOException исключение ввода-вывода. */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // Получение JWT-токена из заголовка Authorization
         String jwt = resolveToken(request);
+
+        // Проверяем валидность токена
         if (jwt != null && tokenProvider.isTokenValid(jwt)) {
+            // Аутентификация пользователя
             authenticate(request, jwt);
         }
+
+        // Продолжаем выполнение остальных фильтров
         filterChain.doFilter(request, response);
     }
 
+    /** * Метод для аутентификации пользователя на основе JWT-токена. *
+     * @param request HTTP-запрос.
+     * @param jwt JWT-токен. */
     private void authenticate(HttpServletRequest request, String jwt) {
+        // Извлечение имени пользователя из токена
         String username = tokenProvider.getUsernameFromJWT(jwt);
+
+        // Извлечение роли из токена
         Role role = tokenProvider.getRoleFromJWT(jwt);
 
-        List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(role.name()));
+        // Создание списка полномочий
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role.name()));
 
+        // Создание объекта UserDetails
         UserDetailsTMS userDetails = new UserDetailsTMS(username, "", authorities);
 
+        // Создание объекта аутентификации
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
+
+        // Установка дополнительных данных аутентификации
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        // Сохранение аутентифицированного пользователя в контексте безопасности
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
+    /** * Метод для извлечения JWT-токена из заголовка Authorization. *
+     * @param req HTTP-запрос.
+     * @return JWT-токен или null, если токен не найден. */
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;

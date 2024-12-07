@@ -11,12 +11,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/** * Реализация сервиса UserDetailsService для загрузки пользователя. */
 @Service
 public class UserDetailsServiceTMS implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
+    /** * Загружает детали пользователя по электронной почте. * * @param email Электронная почта пользователя.
+     * @return Детали пользователя. * @throws UsernameNotFoundException если пользователь
+     * с указанной электронной почтой не найден. */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.findByEmail(email);
