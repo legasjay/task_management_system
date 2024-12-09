@@ -17,6 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.Arrays;
 
 
 /** * Конфигурационный класс для настройки безопасности приложения. */
@@ -58,6 +62,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/users/register").permitAll()
@@ -92,8 +97,34 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /** * Создает и возвращает экземпляр шифровальщика паролей, использующего алгоритм BCrypt. *
+     * @return Экземпляр шифровальщика паролей типа {@link BCryptPasswordEncoder}. */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /** * Создание объекта {@link CorsConfigurationSource}, который определяет правила CORS для всего приложения. *
+     * @return Источник конфигурации CORS. */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Разрешите доступ только для Postman
+        config.setAllowedOriginPatterns(Arrays.asList("*"));
+
+        // Разрешаем все HTTP-методы
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Разрешаем все заголовки
+        config.setAllowedHeaders(Arrays.asList("*"));
+
+        // Разрешаем отправлять куки
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // Применяем эту конфигурацию ко всем URL-адресам приложения
+
+        return source;
     }
 }
