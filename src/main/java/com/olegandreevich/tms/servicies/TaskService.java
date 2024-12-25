@@ -150,7 +150,7 @@ public class TaskService {
      * @throws AccessDeniedException если у пользователя нет доступ к задачам данного исполнителя. */
     public List<TaskDTO> findTasksByAssigneeId(Long assigneeId) {
         Long currentUserId = userCheckService.getCachedUserId();
-        if (!assigneeId.equals(currentUserId)) {
+        if (!assigneeId.equals(currentUserId) && !userCheckService.isAdmin()) {
             throw new AccessDeniedException("Доступ запрещен.");
         }
 
