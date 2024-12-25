@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-/** * Контроллер для аутентификации пользователей. */
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Аутентификация", description = "Операции для получения токенов доступа")
@@ -37,9 +36,6 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
-    /** * Генерация токена доступа для авторизованного пользователя. *
-     * @param loginRequest Запрос на логин с данными пользователя.
-     * @return Токен доступа в виде JSON объекта. */
     @PostMapping("/token")
     @Operation(summary = "Генерация токена доступа",
             description = "Генерирует токен доступа для авторизованного пользователя.",
@@ -66,19 +62,15 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /** * Запрос на логин с данными пользователя. */
     public record LoginRequest(String email, String password, Role role) {
-        /** * Адрес электронной почты пользователя. * * @return Email пользователя. */
         public String email() {
             return email;
         }
 
-        /** * Пароль пользователя. * * @return Пароль пользователя. */
         public String password() {
             return password;
         }
 
-        /** * Роль пользователя. * * @return Роль пользователя. */
         public Role role() {
             return role;
         }

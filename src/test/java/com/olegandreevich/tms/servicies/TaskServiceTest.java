@@ -11,23 +11,17 @@ import com.olegandreevich.tms.mappers.TaskMapper;
 import com.olegandreevich.tms.mappers.TaskMapperGet;
 import com.olegandreevich.tms.repositories.TaskRepository;
 import com.olegandreevich.tms.repositories.UserRepository;
-import com.olegandreevich.tms.security.UserDetailsTMS;
 import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.*;
 
@@ -41,7 +35,8 @@ import static org.mockito.Mockito.*;
 //
 //    @InjectMocks
 //    private TaskService taskService;
-//
+//    @Mock
+//    private UserCheckService userCheckService;
 //    @Mock
 //    private TaskRepository taskRepository;
 //    @Mock
@@ -71,21 +66,24 @@ import static org.mockito.Mockito.*;
 //    TaskDTOGet taskDTOget3 = new TaskDTOGet(1L, "title3", "desc3", Status.IN_PROGRESS, Priority.MEDIUM, 1L, 3L);
 //
 //
-//    @BeforeEach
-//    void setUp() {
-//        Authentication authentication = Mockito.mock(Authentication.class);
-//        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-//        UserDetailsTMS principal = new UserDetailsTMS(user1.getEmail(), user1.getPassword(), Collections.singletonList(new SimpleGrantedAuthority("ADMIN")));
-//
-//        when(authentication.getPrincipal()).thenReturn(principal);
-//        when(securityContext.getAuthentication()).thenReturn(authentication);
-//        SecurityContextHolder.setContext(securityContext);
-//
-//         doReturn(Optional.of(user1)).when(userRepository).findByEmail(eq(user1.getEmail()));
-//        when(userRepository.findByEmail(user1.getEmail())).thenReturn(Optional.of(user1));
-//        when(userRepository.findByEmail(user2.getEmail())).thenReturn(Optional.of(user2));
-//        when(taskService.isAdmin()).thenReturn(true);
-//    }
+////    @BeforeEach
+////    void setUp() {
+////        Authentication authentication = Mockito.mock(Authentication.class);
+////        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+////        UserDetailsTMS principal = new UserDetailsTMS(user1.getEmail(), user1.getPassword(), Collections.singletonList(new SimpleGrantedAuthority("ADMIN")));
+////
+//////        when(authentication.getPrincipal()).thenReturn(principal);
+//////        when(securityContext.getAuthentication()).thenReturn(authentication);
+////        SecurityContextHolder.setContext(securityContext);
+////
+//////         doReturn(Optional.of(user1)).when(userRepository).findByEmail(eq(user1.getEmail()));
+//////        when(userRepository.findByEmail(user1.getEmail())).thenReturn(Optional.of(user1));
+//////        when(userRepository.findByEmail(user2.getEmail())).thenReturn(Optional.of(user2));
+////
+////        // Настройка мока для приватного метода isAdmin()
+////        when(ReflectionTestUtils.invokeMethod(taskService, "isAdmin")).thenReturn(true);
+//////        when(authorizationService.isAdmin()).thenReturn(true);
+////    }
 //
 //
 //    /**
@@ -93,144 +91,142 @@ import static org.mockito.Mockito.*;
 //     */
 //    @Test
 //    void shouldReturnPaginatedTasks_whenPageSizeAndSortParamsProvided() {
-//        // Arrange: подготовка данных
-//        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+//        // Arrange
+//        int page = 0;
+//        int size = 10;
+//        Sort.Direction direction = Sort.Direction.ASC;
+//        String sortField = "title";
 //
-//        // Настройка мока репозитория
-//        List<Task> tasks = Arrays.asList(task1, task2, task3);
-//        Page<Task> pageOfTasks = new PageImpl<>(tasks);
-//        when(taskRepository.findAll(pageRequest)).thenReturn(pageOfTasks);
+//        List tasks = Arrays.asList(task1, task2, task3);
+//        Page pagedTasks = new PageImpl<>(tasks);
+//        when(userCheckService.isAdmin()).thenReturn(true); // Мок администрирования
+//        when(taskRepository.findAll(PageRequest.of(page, size, direction, sortField))).thenReturn(pagedTasks);
+//        when(taskMapperGet.toDto(any(Task.class))).thenReturn(taskDTOget1, taskDTOget2, taskDTOget3);
 //
-//        // Настройка мока для мапперов
-//        when(taskMapperGet.toDto(task1)).thenReturn(taskDTOget1);
-//        when(taskMapperGet.toDto(task2)).thenReturn(taskDTOget2);
-//        when(taskMapperGet.toDto(task3)).thenReturn(taskDTOget3);
+//        // Act
+//        Page result = taskService.getTasks(page, size, direction, sortField);
 //
-//        // Act: вызов метода сервиса
-//        Page<TaskDTOGet> result = taskService.getTasks(0, 10, Sort.Direction.ASC, "id");
-//
-//        // Assert: проверки
+//        // Assert
 //        assertNotNull(result);
-//        assertEquals(3, result.getTotalElements());
-//        assertEquals(3, result.getContent().size());
-//        assertEquals(taskDTOget1, result.getContent().get(0));
+//        assertEquals(3, result.getTotalElements()); // Убедитесь, что количество задач верное
+//        verify(taskRepository).findAll(PageRequest.of(page, size, direction, sortField));
 //    }
 //
-//    /**
-//     * Тест создания новой задачи
-//     */
-//    @Test
-//    void shouldCreateNewTask_andMapItCorrectly() {
-//        // Настройки мока репозитория
-//        lenient().when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-//        lenient().when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
-//        lenient().when(taskRepository.save(any(Task.class))).thenAnswer(i -> i.getArguments()[0]);
+//        /**
+//         * Тест создания новой задачи
+//         */
+//        @Test
+//        void shouldCreateNewTask_andMapItCorrectly() {
+//            // Настройки мока репозитория
+//            lenient().when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+//            lenient().when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+//            lenient().when(taskRepository.save(any(Task.class))).thenAnswer(i -> i.getArguments()[0]);
 //
-//        // Настройка мока для мапперов
-//        when(taskMapper.toEntity(any(TaskDTO.class))).thenAnswer(i -> {
-//            TaskDTO dto = i.getArgument(0);
-//            return new Task(14L, dto.getTitle(), dto.getDescription(),
-//                    dto.getStatus(), dto.getPriority(), user1, user2, new ArrayList<>());
-//        });
+//            // Настройка мока для мапперов
+//            when(taskMapper.toEntity(any(TaskDTO.class))).thenAnswer(i -> {
+//                TaskDTO dto = i.getArgument(0);
+//                return new Task(14L, dto.getTitle(), dto.getDescription(),
+//                        dto.getStatus(), dto.getPriority(), user1, user2, new ArrayList<>());
+//            });
 //
-//        when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
-//            Task task = i.getArgument(0);
-//            return new TaskDTO(task.getTitle(), task.getDescription(),
-//                    task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
-//        });
+//            when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
+//                Task task = i.getArgument(0);
+//                return new TaskDTO(task.getTitle(), task.getDescription(),
+//                        task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
+//            });
 //
-//        // Вызов метода сервиса
-//        TaskDTO createdTaskDTO = taskService.createTask(taskDTO1);
+//            // Вызов метода сервиса
+//            TaskDTO createdTaskDTO = taskService.createTask(taskDTO1);
 //
-//        // Проверка результата
-//        assertEquals(createdTaskDTO, taskDTO1);
-//    }
+//            // Проверка результата
+//            assertEquals(createdTaskDTO, taskDTO1);
+//        }
 //
-//    /**
-//     * Тест обновления существующей задачи
-//     */
-//    @Test
-//    void shouldUpdateExistingTask_andReturnUpdatedDTO() throws ResourceNotFoundException {
-//        // Настройки мока репозитория
-//        when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
-//        when(taskRepository.save(any(Task.class))).thenAnswer(i -> i.getArguments()[0]);
-//        when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
-//            Task task = i.getArgument(0);
-//            return new TaskDTO(task.getTitle(), task.getDescription(),
-//                    task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
-//        });
+//        /**
+//         * Тест обновления существующей задачи
+//         */
+//        @Test
+//        void shouldUpdateExistingTask_andReturnUpdatedDTO() throws ResourceNotFoundException, BadRequestException {
+//            // Настройки мока репозитория
+//            when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
+//            when(taskRepository.save(any(Task.class))).thenAnswer(i -> i.getArguments()[0]);
+//            when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
+//                Task task = i.getArgument(0);
+//                return new TaskDTO(task.getTitle(), task.getDescription(),
+//                        task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
+//            });
 //
-//        // Вызов метода сервиса
-//        TaskDTO updatedTaskDTO = taskService.updateTask(1L, taskDTO1);
+//            // Вызов метода сервиса
+//            TaskDTO updatedTaskDTO = taskService.updateTask(1L, taskDTO1);
 //
-//        // Проверка результата
-//        assertEquals(updatedTaskDTO, taskDTO1);
-//    }
+//            // Проверка результата
+//            assertEquals(updatedTaskDTO, taskDTO1);
+//        }
 //
-//    /**
-//     * Тест удаления задачи
-//     */
-//    @Test
-//    void shouldDeleteExistingTask() throws ResourceNotFoundException {
-//        // Настройки мока репозитория
-//        when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
+//        /**
+//         * Тест удаления задачи
+//         */
+//        @Test
+//        void shouldDeleteExistingTask() throws ResourceNotFoundException {
+//            // Настройки мока репозитория
+//            when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
 //
-//        // Вызов метода сервиса
-//        taskService.deleteTask(1L);
+//            // Вызов метода сервиса
+//            taskService.deleteTask(1L);
 //
-//        // Проверка вызова удаления
-//        verify(taskRepository).delete(task1);
-//    }
+//            // Проверка вызова удаления
+//            verify(taskRepository).delete(task1);
+//        }
 //
-//    /**
-//     * Тест получения задачи по ID
-//     */
-//    @Test
-//    void shouldReturnTaskDTO_whenTaskFoundById() throws ResourceNotFoundException {
-//        // Настройки мока репозитория
-//        when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
-//        when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
-//            Task task = i.getArgument(0);
-//            return new TaskDTO(task.getTitle(), task.getDescription(),
-//                    task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
-//        });
+//        /**
+//         * Тест получения задачи по ID
+//         */
+//        @Test
+//        void shouldReturnTaskDTO_whenTaskFoundById() throws ResourceNotFoundException {
+//            // Настройки мока репозитория
+//            when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
+//            when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
+//                Task task = i.getArgument(0);
+//                return new TaskDTO(task.getTitle(), task.getDescription(),
+//                        task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
+//            });
 //
-//        // Вызов метода сервиса
-//        TaskDTO retrievedTaskDTO = taskService.getTaskById(1L);
+//            // Вызов метода сервиса
+//            TaskDTO retrievedTaskDTO = taskService.getTaskById(1L);
 //
-//        // Проверка результата
-//        assertEquals(retrievedTaskDTO, taskDTO1);
-//    }
+//            // Проверка результата
+//            assertEquals(retrievedTaskDTO, taskDTO1);
+//        }
 //
-//    @Test
-//    void shouldReturnTasks_whenSearchedByAuthorId() {
-//        when(taskService.getCachedUserId()).thenReturn(1L); // Мок для текущего пользователя
-//        when(taskRepository.findByAuthor_Id(1L)).thenReturn(Arrays.asList(task1)); // Настроить мок-объект taskRepository
+//        @Test
+//        void shouldReturnTasks_whenSearchedByAuthorId() {
+//            when(taskService.getCachedUserId()).thenReturn(1L); // Мок для текущего пользователя
+//            when(taskRepository.findByAuthor_Id(1L)).thenReturn(Arrays.asList(task1)); // Настроить мок-объект taskRepository
 //
-//        when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
-//            Task task = i.getArgument(0);
-//            return new TaskDTO(task.getTitle(), task.getDescription(),
-//                    task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
-//        });
+//            when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
+//                Task task = i.getArgument(0);
+//                return new TaskDTO(task.getTitle(), task.getDescription(),
+//                        task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
+//            });
 //
-//        List<TaskDTO> tasksByAuthor = taskService.findTasksByAuthorId(1L);
+//            List<TaskDTO> tasksByAuthor = taskService.findTasksByAuthorId(1L);
 //
-//        assertEquals(tasksByAuthor, Arrays.asList(taskDTO1));
-//    }
+//            assertEquals(tasksByAuthor, Arrays.asList(taskDTO1));
+//        }
 //
-//    @Test
-//    void shouldReturnTasks_whenSearchedByAssigneeId() {
-//        when(taskService.getCachedUserId()).thenReturn(2L); // Мок для текущего пользователя
-//        when(taskRepository.findByAssignee_Id(2L)).thenReturn(Arrays.asList(task1)); // Настраиваем мок-объект taskRepository
+//        @Test
+//        void shouldReturnTasks_whenSearchedByAssigneeId() {
+//            when(taskService.getCachedUserId()).thenReturn(2L); // Мок для текущего пользователя
+//            when(taskRepository.findByAssignee_Id(2L)).thenReturn(Arrays.asList(task1)); // Настраиваем мок-объект taskRepository
 //
-//        when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
-//            Task task = i.getArgument(0);
-//            return new TaskDTO(task.getTitle(), task.getDescription(),
-//                    task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
-//        });
+//            when(taskMapper.toDto(any(Task.class))).thenAnswer(i -> {
+//                Task task = i.getArgument(0);
+//                return new TaskDTO(task.getTitle(), task.getDescription(),
+//                        task.getStatus(), task.getPriority(), task.getAuthor().getId(), task.getAssignee().getId());
+//            });
 //
-//        List<TaskDTO> tasksByAssignee = taskService.findTasksByAssigneeId(2L);
+//            List<TaskDTO> tasksByAssignee = taskService.findTasksByAssigneeId(2L);
 //
-//        assertEquals(tasksByAssignee, Arrays.asList(taskDTO1));
+//            assertEquals(tasksByAssignee, Arrays.asList(taskDTO1));
 //    }
 //}

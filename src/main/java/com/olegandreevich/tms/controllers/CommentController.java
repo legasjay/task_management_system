@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/** * Контроллер для управления комментариями к задачам. */
 @RestController
 @RequestMapping("/api/tasks/{taskId}/comments")
 @Tag(name = "Комментарии", description = "Операции с комментариями к задачам")
@@ -23,17 +22,10 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    /** * Конструктор класса CommentController. * * @param commentService Сервис для работы с комментариями. */
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
 
-    /** * Добавление комментария к задаче. *
-     * @param taskId Идентификатор задачи.
-     * @param userId Идентификатор пользователя.
-     * @param commentDTO Данные для добавления комментария.
-     * @return Добавленный комментарий.
-     * @throws ResourceNotFoundException Если задача не найдена. */
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Добавление комментария к задаче",

@@ -23,17 +23,11 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
-    /** * Конструктор класса UserController. *
-     * @param passwordEncoder Кодировщик паролей.
-     * @param userService Сервис для работы с пользователями. */
     public UserController(PasswordEncoder passwordEncoder, UserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
     }
 
-    /** * Регистрация нового пользователя. *
-     * @param dto Данные для регистрации пользователя.
-     * @return Зарегистрированный пользователь. */
     @PostMapping("/register")
     @Operation(summary = "Регистрация нового пользователя",
             description = "Регистрирует нового пользователя на основе предоставленных данных.",
@@ -48,8 +42,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    /** * Получение списка всех пользователей. *
-     * @return Список всех пользователей. */
     @GetMapping
     @Operation(summary = "Получение списка всех пользователей",
             description = "Возвращает список всех зарегистрированных пользователей.",
@@ -60,9 +52,6 @@ public class UserController {
         return userService.findAll();
     }
 
-    /** * Получение пользователя по идентификатору. *
-     * @param userId Идентификатор пользователя.
-     * @return Пользователь с указанным идентификатором. */
     @GetMapping("/{userId}")
     @Operation(summary = "Получение пользователя по идентификатору",
             description = "Возвращает пользователя с указанным идентификатором.",

@@ -4,7 +4,6 @@ import com.olegandreevich.tms.dto.TaskDTO;
 import com.olegandreevich.tms.dto.TaskDTOGet;
 import com.olegandreevich.tms.entities.Task;
 import com.olegandreevich.tms.entities.User;
-import com.olegandreevich.tms.entities.enums.Role;
 import com.olegandreevich.tms.entities.enums.Status;
 import com.olegandreevich.tms.mappers.TaskMapper;
 import com.olegandreevich.tms.mappers.TaskMapperGet;
@@ -15,12 +14,12 @@ import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -39,75 +38,15 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final TaskMapperGet taskMapperGet;
     private final UserRepository userRepository;
-
-    private static final String CURRENT_USER_ID_CACHE_KEY = "current_user_id";
-    private Long cachedUserId;
-
-    /** * Инициализирует кэш текущего пользователя. */
-    @PostConstruct
-    public void init() {
-        this.cachedUserId = null;
-    }
-
-    /** * Возвращает ID текущего пользователя. *
-     * @return ID текущего пользователя.
-     * @throws RuntimeException если возникают ошибки при получении ID пользователя. */
-    @Cacheable(value = CURRENT_USER_ID_CACHE_KEY)
-    Long getCurrentUserId() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal instanceof UserDetailsTMS) {
-            String username = ((UserDetailsTMS) principal).getUsername();
-
-            try {
-                Optional<User> optionalUser = userRepository.findByEmail(username);
-
-                if (optionalUser.isPresent()) {
-                    return optionalUser.get().getId();
-                } else {
-                    throw new RuntimeException("Пользователь с таким email не найден.");
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Ошибка при получении текущего ID пользователя.", e);
-            }
-        }
-
-        throw new RuntimeException("Не удалось получить текущий ID пользователя.");
-    }
-
-    /** * Возвращает кэшированное значение ID текущего пользователя. *
-     * @return ID текущего пользователя. */
-    public Long getCachedUserId() {
-        if (cachedUserId == null) {
-            cachedUserId = getCurrentUserId();
-        }
-        return cachedUserId;
-    }
-
-    /** * Проверяет, является ли текущий пользователь администратором. *
-     * @return true, если пользователь является администратором, иначе false. */
-    private boolean isAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals(Role.ADMIN.toString()));
-    }
-
-    /** * Проверяет, назначен ли текущий пользователь исполнителем данной задачи. *
-     * @param task Задача,
-     * для которой проверяется назначенное лицо.
-     * @return true, если текущий пользователь является исполнителем задачи, иначе false. */
-    private boolean isTaskAssignee(Task task) {
-        Long currentUserId = getCurrentUserId();
-        return Objects.equals(currentUserId, task.getAssignee().getId());
-    }
+    private final UserCheckService userCheckService;
 
     /** * Возвращает список задач с учетом заданных параметров пагинации и сортировки. * * @param page Номер страницы.
      * @param size Размер страницы. * @param direction Направление сортировки.
      * @param sortField Поле для сортировки. * @return Страница объектов DTO задач.
      * @throws AccessDeniedException если у пользователя нет прав администратора. */
     public Page<TaskDTOGet> getTasks(int page, int size, Sort.Direction direction, String sortField) {
-        if (!isAdmin()) {
-            throw new AccessDeniedException("У вас нет прав для изменения статуса этой задачи.");
+        if (!userCheckService.isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для получения всех задач.");
         }
         PageRequest pageRequest = PageRequest.of(page, size, direction, sortField);
         return taskRepository.findAll(pageRequest).map(taskMapperGet::toDto);
@@ -135,9 +74,26 @@ public class TaskService {
      * @param taskDTO DTO объекта задачи с новыми данными.
      * @return DTO обновленной задачи.
      * @throws ResourceNotFoundException если задача с указанным ID не найдена. */
-    public TaskDTO updateTask(Long id, TaskDTO taskDTO) throws ResourceNotFoundException {
+    public TaskDTO updateTask(Long id, TaskDTO taskDTO) throws ResourceNotFoundException, BadRequestException {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+
+        if (!userCheckService.isAdmin()) { // Если текущий пользователь не является администратором
+            if (!userCheckService.isAssignee(existingTask.getAssignee().getId())) { // И не является исполнителем задачи
+                throw new AccessDeniedException("У вас нет прав на обновление этой задачи.");
+            }
+            if (taskDTO.getTitle() != null && !taskDTO.getTitle().equals(existingTask.getTitle())) {
+                throw new BadRequestException("Вы не можете изменить название задачи.");
+            }
+            if (taskDTO.getDescription() != null && !taskDTO.getDescription().equals(existingTask.getDescription())) {
+                throw new BadRequestException("Вы не можете изменить описание задачи.");
+            }
+            if (taskDTO.getPriority() != null && !taskDTO.getPriority().equals(existingTask.getPriority())) {
+                throw new BadRequestException("Вы не можете изменить приоритет задачи.");
+            }
+        }
+
+        // Обновляем задачу
         existingTask.setTitle(taskDTO.getTitle());
         existingTask.setDescription(taskDTO.getDescription());
         existingTask.setStatus(taskDTO.getStatus());
@@ -150,6 +106,9 @@ public class TaskService {
      * @param id ID задачи для удаления.
      * @throws ResourceNotFoundException если задача с указанным ID не найдена. */
     public void deleteTask(Long id) throws ResourceNotFoundException {
+        if (!userCheckService.isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для удаления задачи.");
+        }
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
         taskRepository.delete(existingTask);
@@ -164,8 +123,8 @@ public class TaskService {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
 
-        if (!isTaskAssignee(existingTask) && !isAdmin()) {
-            throw new AccessDeniedException("У вас нет прав для изменения статуса этой задачи.");
+        if (!userCheckService.isAssignee(existingTask.getAssignee().getId()) && !userCheckService.isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для получения этой задачи.");
         }
         return taskMapper.toDto(existingTask);
     }
@@ -175,8 +134,8 @@ public class TaskService {
      * @return Список DTO задач.
      * @throws AccessDeniedException если у пользователя нет доступа к задачам данного автора. */
     public List<TaskDTO> findTasksByAuthorId(Long authorId) {
-        Long currentUserId = getCachedUserId();
-        if (!authorId.equals(currentUserId) && !isAdmin()) {
+        Long currentUserId = userCheckService.getCachedUserId();
+        if (!authorId.equals(currentUserId) && !userCheckService.isAdmin()) {
             throw new AccessDeniedException("Доступ запрещен.");
         }
 
@@ -190,41 +149,14 @@ public class TaskService {
      * @return Список DTO задач.
      * @throws AccessDeniedException если у пользователя нет доступ к задачам данного исполнителя. */
     public List<TaskDTO> findTasksByAssigneeId(Long assigneeId) {
-        Long currentUserId = getCachedUserId();
-        if (!assigneeId.equals(currentUserId) && !isAdmin()) {
+        Long currentUserId = userCheckService.getCachedUserId();
+        if (!assigneeId.equals(currentUserId)) {
             throw new AccessDeniedException("Доступ запрещен.");
         }
 
         return taskRepository.findByAssignee_Id(assigneeId).stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-
-    /** * Изменяет статус задачи. * * @param id ID задачи.
-     * @param status Новый статус задачи.
-     * @return DTO задачи с изменённым статусом.
-     * @throws ResourceNotFoundException если задач с указанным ID не найдена.
-     * @throws IllegalArgumentException если переданный статус неверный.
-     * @throws AccessDeniedException если у пользователя нет прав для изменения статуса задачи. */
-    public TaskDTOGet changeTaskStatus(Long id, String status) throws ResourceNotFoundException {
-        Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
-
-        if (!isTaskAssignee(existingTask) && !isAdmin()) {
-            throw new AccessDeniedException("У вас нет прав для изменения статуса этой задачи.");
-        }
-
-        try {
-            Status newStatus = Status.valueOf(status);
-            existingTask.setStatus(newStatus);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Неверное значение статуса: " + status);
-        }
-
-        Task updatedTask = taskRepository.save(existingTask);
-
-        return taskMapperGet.toDto(updatedTask);
     }
 }
 
