@@ -2,11 +2,13 @@ package com.olegandreevich.tms.servicies;
 
 import com.olegandreevich.tms.dto.TaskDTO;
 import com.olegandreevich.tms.dto.TaskDTOGet;
+import com.olegandreevich.tms.dto.TaskWithCommentsDTO;
 import com.olegandreevich.tms.entities.Task;
 import com.olegandreevich.tms.entities.User;
 import com.olegandreevich.tms.entities.enums.Status;
 import com.olegandreevich.tms.mappers.TaskMapper;
 import com.olegandreevich.tms.mappers.TaskMapperGet;
+import com.olegandreevich.tms.mappers.TaskWithCommentsMapper;
 import com.olegandreevich.tms.repositories.TaskRepository;
 import com.olegandreevich.tms.repositories.UserRepository;
 import com.olegandreevich.tms.security.UserDetailsTMS;
@@ -39,6 +41,7 @@ public class TaskService {
     private final TaskMapperGet taskMapperGet;
     private final UserRepository userRepository;
     private final UserCheckService userCheckService;
+    private final TaskWithCommentsMapper taskWithCommentsMapper;
 
     /** * Возвращает список задач с учетом заданных параметров пагинации и сортировки. * * @param page Номер страницы.
      * @param size Размер страницы. * @param direction Направление сортировки.
@@ -156,6 +159,38 @@ public class TaskService {
 
         return taskRepository.findByAssignee_Id(assigneeId).stream()
                 .map(taskMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /** * Возвращает список задач по ID автора и комментариев к ним *
+     * @param authorId ID автора задач.
+     * @return Список DTO задач.
+     * @throws AccessDeniedException если у пользователя нет доступа к задачам данного автора. */
+    public List<TaskWithCommentsDTO> findTasksByAuthorIdWithComments(Long authorId) {
+        Long currentUserId = userCheckService.getCachedUserId();
+        if (!authorId.equals(currentUserId) && !userCheckService.isAdmin()) {
+            throw new AccessDeniedException("Доступ запрещен.");
+        }
+
+        List<Task> tasks = taskRepository.findByAuthor_Id(authorId);
+        return tasks.stream()
+                .map(taskWithCommentsMapper::toDtoWithComments)
+                .collect(Collectors.toList());
+    }
+
+    /** * Возвращает список задач по ID исполнителя и комментариев к ним *
+     * @param assigneeId ID исполнителя задач.
+     * @return Список DTO задач.
+     * @throws AccessDeniedException если у пользователя нет доступ к задачам данного исполнителя. */
+    public List<TaskWithCommentsDTO> findTasksByAssigneeIdWithComments(Long assigneeId) {
+        Long currentUserId = userCheckService.getCachedUserId();
+        if (!assigneeId.equals(currentUserId) && !userCheckService.isAdmin()) {
+            throw new AccessDeniedException("Доступ запрещен.");
+        }
+
+        List<Task> tasks = taskRepository.findByAssignee_Id(assigneeId);
+        return tasks.stream()
+                .map(taskWithCommentsMapper::toDtoWithComments)
                 .collect(Collectors.toList());
     }
 }
