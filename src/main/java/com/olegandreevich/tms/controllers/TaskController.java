@@ -2,6 +2,7 @@ package com.olegandreevich.tms.controllers;
 
 import com.olegandreevich.tms.dto.TaskDTO;
 import com.olegandreevich.tms.dto.TaskDTOGet;
+import com.olegandreevich.tms.dto.TaskWithCommentsDTO;
 import com.olegandreevich.tms.servicies.TaskService;
 import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -122,5 +123,31 @@ public class TaskController {
             @Parameter(description = "Идентификатор исполнителя") @PathVariable Long assigneeId
     ) {
         return taskService.findTasksByAssigneeId(assigneeId);
+    }
+
+    @GetMapping("/author/{authorId}/with-comments")
+    @Operation(summary = "Поиск задач по идентификатору автора с комментариями",
+            description = "Возвращает список задач, созданных автором с указанным идентификатором, с комментариями.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список задач успешно получен"),
+                    @ApiResponse(responseCode = "404", description = "Автор не найден")
+            })
+    public List<TaskWithCommentsDTO> findTasksByAuthorIdWithComments(
+            @Parameter(description = "Идентификатор автора") @PathVariable Long authorId
+    ) {
+        return taskService.findTasksByAuthorIdWithComments(authorId);
+    }
+
+    @GetMapping("/assignee/{assigneeId}/with-comments")
+    @Operation(summary = "Поиск задач по идентификатору исполнителя с комментариями",
+            description = "Возвращает список задач, назначенных исполнителю с указанным идентификатором, с комментариями.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список задач успешно получен"),
+                    @ApiResponse(responseCode = "404", description = "Исполнитель не найден")
+            })
+    public List<TaskWithCommentsDTO> findTasksByAssigneeIdWithComments(
+            @Parameter(description = "Идентификатор исполнителя") @PathVariable Long assigneeId
+    ) {
+        return taskService.findTasksByAssigneeIdWithComments(assigneeId);
     }
 }
