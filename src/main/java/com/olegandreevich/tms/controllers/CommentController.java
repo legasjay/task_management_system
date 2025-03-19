@@ -1,6 +1,7 @@
 package com.olegandreevich.tms.controllers;
 
 import com.olegandreevich.tms.dto.CommentDTO;
+import com.olegandreevich.tms.entities.Comment;
 import com.olegandreevich.tms.servicies.CommentService;
 import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,5 +75,18 @@ public class CommentController {
             @Parameter(description = "Идентификатор комментария") @PathVariable Long commentId
     ) throws ResourceNotFoundException {
         commentService.deleteComment(commentId);
+    }
+
+    /** * Получение всех комментариев. *
+     * @return Список всех комментариев.
+     */
+    @GetMapping
+    @Operation(summary = "Получение списка всех комментариев",
+            description = "Возвращает список всех комментариев.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список комментариев успешно получен")
+            })
+    public List<Comment> findAll() {
+        return commentService.findAll();
     }
 }

@@ -174,9 +174,9 @@ public class TaskService {
             throw new AccessDeniedException("Доступ запрещен.");
         }
 
-        List<Task> tasks = taskRepository.findByAuthor_Id(assigneeId);
+        List<Task> tasks = taskRepository.findByAssignee_Id(assigneeId);
         return tasks.stream()
-                .map(this::convertToTaskWithCommentsDTO)
+                .map(taskWithCommentsMapper::toDtoWithComments)
                 .collect(Collectors.toList());
     }
 
@@ -192,27 +192,27 @@ public class TaskService {
 
         List<Task> tasks = taskRepository.findByAuthor_Id(authorId);
         return tasks.stream()
-                .map(this::convertToTaskWithCommentsDTO)
+                .map(taskWithCommentsMapper::toDtoWithComments)
                 .collect(Collectors.toList());
     }
 
-    /** * Конвертирует Task в TaskWithCommentsDTO *
-     * @param task
-     * @return задачу вместе с комментариями
-     */
-    private TaskWithCommentsDTO convertToTaskWithCommentsDTO(Task task) {
-        TaskWithCommentsDTO dto = new TaskWithCommentsDTO();
-        dto.setId(task.getId());
-        dto.setTitle(task.getTitle());
-        dto.setDescription(task.getDescription());
-        dto.setStatus(task.getStatus());
-        dto.setPriority(task.getPriority());
-        dto.setAuthorId(task.getAuthor().getId());
-        dto.setAssigneeId(task.getAssignee().getId());
-        dto.setComments(commentService.getCommentsForTask(task.getId()).stream()
-                .map(comment -> new CommentDTO(comment.getContent()))
-                .collect(Collectors.toList()));
-        return dto;
-    }
+//    /** * Конвертирует Task в TaskWithCommentsDTO *
+//     * @param task
+//     * @return задачу вместе с комментариями
+//     */
+//    private TaskWithCommentsDTO convertToTaskWithCommentsDTO(Task task) {
+//        TaskWithCommentsDTO dto = new TaskWithCommentsDTO();
+//        dto.setId(task.getId());
+//        dto.setTitle(task.getTitle());
+//        dto.setDescription(task.getDescription());
+//        dto.setStatus(task.getStatus());
+//        dto.setPriority(task.getPriority());
+//        dto.setAuthorId(task.getAuthor().getId());
+//        dto.setAssigneeId(task.getAssignee().getId());
+//        dto.setComments(commentService.getCommentsForTask(task.getId()).stream()
+//                .map(comment -> new CommentDTO(comment.getContent()))
+//                .collect(Collectors.toList()));
+//        return dto;
+//    }
 }
 

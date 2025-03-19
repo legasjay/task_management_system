@@ -55,10 +55,7 @@ public class CommentService {
     }
 
     /** * Возвращает список всех комментариев. * * @return Список DTO всех комментариев. */
-    public List<CommentDTO> findAll() {
-        return commentRepository.findAll()
-                .stream()
-                .map((element) -> modelMapper.map(element, CommentDTO.class))
-                .toList();
+    public List<Comment> findAll() {
+        return commentRepository.findAll();
     }
 }
