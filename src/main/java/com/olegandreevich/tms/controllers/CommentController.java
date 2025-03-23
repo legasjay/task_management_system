@@ -80,13 +80,13 @@ public class CommentController {
     /** * Получение всех комментариев. *
      * @return Список всех комментариев.
      */
-    @GetMapping
-    @Operation(summary = "Получение списка всех комментариев",
-            description = "Возвращает список всех комментариев.",
+    @GetMapping("/")
+    @Operation(summary = "Получение всех комментариев",
+            description = "Возвращает список всех существующих комментариев.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Список комментариев успешно получен")
             })
-    public List<Comment> findAll() {
-        return commentService.findAll();
+    public List<Comment> getAllComments() {
+        return commentService.getAllComments();
     }
 }
