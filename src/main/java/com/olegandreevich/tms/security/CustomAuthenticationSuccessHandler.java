@@ -11,33 +11,45 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** * Класс обработчика успешного входа пользователя. */
+/**
+ * Класс обработчика успешного входа пользователя.
+ */
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    /** * Путь к файлу свойств, где хранится время жизни JWT-токена. */
+    /**
+     * Путь к файлу свойств, где хранится время жизни JWT-токена.
+     */
     @Value("${app.jwtExpirationInMs}")
     private long jwtExpirationInMs;
 
-    /** * Провайдер для генерации JWT-токенов. */
+    /**
+     * Провайдер для генерации JWT-токенов.
+     */
     private final JwtTokenProvider tokenProvider;
 
-    /** * Конструктор класса. * * @param tokenProvider провайдер для генерации JWT-токенов. */
+    /**
+     * Конструктор класса. * * @param tokenProvider провайдер для генерации JWT-токенов.
+     */
     @Autowired
     public CustomAuthenticationSuccessHandler(JwtTokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
 
-    /** * Метод обработки успешной аутентификации. *
-     * @param request HTTP-запрос. * @param response HTTP-ответ.
+    /**
+     * Метод обработки успешной аутентификации. *
+     *
+     * @param request        HTTP-запрос. * @param response HTTP-ответ.
      * @param authentication объект аутентификации.
-     * @throws IOException исключение ввода-вывода.
-     * @throws ServletException исключение сервлета. */
+     * @throws IOException      исключение ввода-вывода.
+     * @throws ServletException исключение сервлета.
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,

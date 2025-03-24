@@ -9,7 +9,7 @@ import com.olegandreevich.tms.util.exceptions.InvalidPasswordException;
 import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import com.olegandreevich.tms.util.exceptions.UsernameAlreadyExistsException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +19,16 @@ import java.util.Optional;
 /** * Сервис для работы с пользователями. * Включает регистрацию новых пользователей, изменение ролей
  * и обновление паролей. */
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     /** * Регистрирует нового пользователя. * * @param dto Объект регистрации пользователя.
      * @return Зарегистрированный пользователь.
