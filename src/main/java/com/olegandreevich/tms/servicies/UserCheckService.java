@@ -1,28 +1,31 @@
 package com.olegandreevich.tms.servicies;
 
-import com.olegandreevich.tms.entities.Task;
 import com.olegandreevich.tms.entities.User;
 import com.olegandreevich.tms.entities.enums.Role;
 import com.olegandreevich.tms.repositories.UserRepository;
 import com.olegandreevich.tms.security.UserDetailsTMS;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 /** Сервис для проверки, кем является пользователь (администратор, исполнитель или автор задачи) */
 @Service
-@RequiredArgsConstructor
+
 public class UserCheckService {
 
     private final UserRepository userRepository;
     private static final String CURRENT_USER_ID_CACHE_KEY = "current_user_id";
     private Long cachedUserId;
+
+    @Autowired
+    public UserCheckService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     /** * Инициализирует кэш текущего пользователя. */
     @PostConstruct

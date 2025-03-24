@@ -1,6 +1,5 @@
 package com.olegandreevich.tms.mappers;
 
-import com.olegandreevich.tms.dto.TaskDTO;
 import com.olegandreevich.tms.dto.TaskDTOGet;
 import com.olegandreevich.tms.entities.Task;
 import org.modelmapper.ModelMapper;

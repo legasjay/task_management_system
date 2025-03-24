@@ -2,16 +2,7 @@ package com.olegandreevich.tms.dto;
 
 import com.olegandreevich.tms.entities.enums.Priority;
 import com.olegandreevich.tms.entities.enums.Status;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class TaskDTO {
     private String title;
     private String description;
@@ -19,4 +10,65 @@ public class TaskDTO {
     private Priority priority;
     private Long authorId;
     private Long assigneeId;
+
+    public TaskDTO(String title, String description, Status status, Priority priority, Long authorId, Long assigneeId) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.priority = priority;
+        this.authorId = authorId;
+        this.assigneeId = assigneeId;
+    }
+
+    public TaskDTO() {
+
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
+    }
+
+    public Long getAssigneeId() {
+        return assigneeId;
+    }
+
+    public void setAssigneeId(Long assigneeId) {
+        this.assigneeId = assigneeId;
+    }
 }

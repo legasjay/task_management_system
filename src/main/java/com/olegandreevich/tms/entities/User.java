@@ -3,19 +3,10 @@ package com.olegandreevich.tms.entities;
 import com.olegandreevich.tms.entities.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
 
     @Id
@@ -43,7 +34,7 @@ public class User {
     @OneToMany(mappedBy = "assignee")
     private Set<Task> tasksAsAssignee;
 
-    @Builder
+
     public User(String email, String username, String password) {
         this.email = email;
         this.username = username;
@@ -51,16 +42,16 @@ public class User {
         this.role = Role.USER;
     }
 
+    public User() {
+
+    }
+
     public User(Long userId) {
         this.id = userId;
     }
 
-    public static User of(String email, String password) {
-        return builder()
-                .email(email)
-                .password(password)
-                .role(Role.USER)
-                .build();
+    public User(long l, String mail, String user1, String pass, Role role, Object o, Object o1) {
+
     }
 
     public boolean isAdmin() {
@@ -75,4 +66,61 @@ public class User {
         this.role = Role.USER;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public @Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$",
+            message = "Неверный формат электронной почты") String getEmail() {
+        return email;
+    }
+
+    public void setEmail(@Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$",
+            message = "Неверный формат электронной почты") String email) {
+        this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Set<Task> getTasksAsAuthor() {
+        return tasksAsAuthor;
+    }
+
+    public void setTasksAsAuthor(Set<Task> tasksAsAuthor) {
+        this.tasksAsAuthor = tasksAsAuthor;
+    }
+
+    public Set<Task> getTasksAsAssignee() {
+        return tasksAsAssignee;
+    }
+
+    public void setTasksAsAssignee(Set<Task> tasksAsAssignee) {
+        this.tasksAsAssignee = tasksAsAssignee;
+    }
 }

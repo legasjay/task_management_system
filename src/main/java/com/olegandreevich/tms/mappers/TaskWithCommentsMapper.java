@@ -1,7 +1,6 @@
 package com.olegandreevich.tms.mappers;
 
 import com.olegandreevich.tms.dto.CommentDTO;
-import com.olegandreevich.tms.dto.TaskDTOGet;
 import com.olegandreevich.tms.dto.TaskWithCommentsDTO;
 import com.olegandreevich.tms.entities.Task;
 import com.olegandreevich.tms.servicies.CommentService;

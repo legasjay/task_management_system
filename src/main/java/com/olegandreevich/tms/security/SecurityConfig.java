@@ -2,7 +2,6 @@ package com.olegandreevich.tms.security;
 
 import com.olegandreevich.tms.servicies.UserDetailsServiceTMS;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

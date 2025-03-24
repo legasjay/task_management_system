@@ -1,7 +1,6 @@
 package com.olegandreevich.tms.security;
 
 import com.olegandreevich.tms.entities.User;
-import com.olegandreevich.tms.entities.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
