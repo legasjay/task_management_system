@@ -50,8 +50,14 @@ public class User {
         this.id = userId;
     }
 
-    public User(long l, String mail, String user1, String pass, Role role, Object o, Object o1) {
-
+    public User(Long id, String email, String username, String password, Role role, Set<Task> tasksAsAuthor, Set<Task> tasksAsAssignee) {
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.tasksAsAuthor = tasksAsAuthor;
+        this.tasksAsAssignee = tasksAsAssignee;
     }
 
     public boolean isAdmin() {
