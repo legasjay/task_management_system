@@ -285,6 +285,21 @@ class TaskServiceTest {
         // Настройка мок-объекта commentService
         when(commentService.getCommentsForTask(1L)).thenReturn(Arrays.asList(commentDTO1));
 
+        // Настройка мок-объекта taskWithCommentsMapper
+        when(taskWithCommentsMapper.toDtoWithComments(any(Task.class)))
+                .thenAnswer(i -> {
+                    Task task = i.getArgument(0);
+                    return new TaskWithCommentsDTO(
+                            task.getId(),
+                            task.getTitle(),
+                            task.getDescription(),
+                            task.getStatus(),
+                            task.getPriority(),
+                            task.getAuthor().getId(),
+                            task.getAssignee().getId(),
+                            commentService.getCommentsForTask(task.getId()));
+                });
+
         // Выполнение метода
         List<TaskWithCommentsDTO> result = taskService.findTasksByAuthorIdWithComments(1L);
 
@@ -303,6 +318,21 @@ class TaskServiceTest {
 
         // Настройка мок-объекта commentService
         when(commentService.getCommentsForTask(2L)).thenReturn(Arrays.asList(commentDTO2));
+
+        // Настройка мок-объекта taskWithCommentsMapper
+        when(taskWithCommentsMapper.toDtoWithComments(any(Task.class)))
+                .thenAnswer(i -> {
+                    Task task = i.getArgument(0);
+                    return new TaskWithCommentsDTO(
+                            task.getId(),
+                            task.getTitle(),
+                            task.getDescription(),
+                            task.getStatus(),
+                            task.getPriority(),
+                            task.getAuthor().getId(),
+                            task.getAssignee().getId(),
+                            commentService.getCommentsForTask(task.getId()));
+                });
 
         // Выполнение метода
         List<TaskWithCommentsDTO> result = taskService.findTasksByAssigneeIdWithComments(2L);
