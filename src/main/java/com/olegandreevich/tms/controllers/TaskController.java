@@ -40,7 +40,8 @@ public class TaskController {
     public List<TaskDTOGet> getTasks(
             @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Направление сортировки") @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @Parameter(description = "Направление сортировки")
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @Parameter(description = "Поле для сортировки") @RequestParam(defaultValue = "id") String sortField
     ) {
         return taskService.getTasks(page, size, direction, sortField).getContent();
@@ -54,7 +55,8 @@ public class TaskController {
                     @ApiResponse(responseCode = "201", description = "Задача успешно создана"),
                     @ApiResponse(responseCode = "400", description = "Некорректные данные задачи")
             })
-    public TaskDTO createTask(@Parameter(description = "Данные для создания задачи") @Valid @RequestBody TaskDTO taskDTO) {
+    public TaskDTO createTask(@Parameter(description = "Данные для создания задачи")
+                                  @Valid @RequestBody TaskDTO taskDTO) {
         return taskService.createTask(taskDTO);
     }
 
@@ -140,7 +142,8 @@ public class TaskController {
 
     @GetMapping("/assignee/{assigneeId}/with-comments")
     @Operation(summary = "Поиск задач по идентификатору исполнителя с комментариями",
-            description = "Возвращает список задач, назначенных исполнителю с указанным идентификатором, с комментариями.",
+            description =
+                    "Возвращает список задач, назначенных исполнителю с указанным идентификатором, с комментариями.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Список задач успешно получен"),
                     @ApiResponse(responseCode = "404", description = "Исполнитель не найден")

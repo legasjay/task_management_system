@@ -23,6 +23,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final ModelMapper modelMapper;
+    private final UserCheckService userCheckService;
 
     /** * Добавляет новый комментарий к задаче. * * @param taskId ID задачи, к которой добавляется комментарий.
      * @param userId ID пользователя, оставившего комментарий. * @param commentDTO DTO объекта комментария
@@ -54,11 +55,9 @@ public class CommentService {
         commentRepository.deleteById(id);
     }
 
-    /** * Возвращает список всех комментариев. * * @return Список DTO всех комментариев. */
-    public List<CommentDTO> findAll() {
-        return commentRepository.findAll()
-                .stream()
-                .map((element) -> modelMapper.map(element, CommentDTO.class))
-                .toList();
+    /** * Получение всех комментариев. * * @return Список всех комментариев в виде DTO. */
+    @Transactional(readOnly = true)
+    public List<Comment> getAllComments() {
+        return commentRepository.findAll();
     }
 }

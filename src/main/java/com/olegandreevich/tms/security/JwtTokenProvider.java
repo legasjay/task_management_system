@@ -31,7 +31,8 @@ public class JwtTokenProvider {
             return JWT.create()
                     .withIssuer("tms")             // Указывает издателя токена
                     .withSubject(username)         // Указывает субъект (пользователь)
-                    .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs)) // Устанавливает срок действия токена
+                    .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                        // Устанавливает срок действия токена
                     .withClaim("role", role.name()) // Добавляет роль в токен
                     .sign(algorithm);              // Подписывает токен
         } catch (IllegalArgumentException e) {
