@@ -2,9 +2,6 @@ package com.olegandreevich.tms.dto;
 
 import com.olegandreevich.tms.entities.enums.Priority;
 import com.olegandreevich.tms.entities.enums.Status;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 

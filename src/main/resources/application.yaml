@@ -1,3 +1,4 @@
+# Для запуска через docker-compose раскоментировать блок кода.
 #app:
 #  jwtSecret: 'my_secret_key'  # замените my_secret_key на реальный секретный ключ
 #  jwtExpirationInMs: 3600000  # срок жизни токена в миллисекундах (в данном примере 1 час) 3 600 000
@@ -19,6 +20,7 @@
 #      example:
 #        security:
 #          JwtAuthenticationFilter: DEBUG
+
 app:
   jwtSecret: 'my_secret_key'
   jwtExpirationInMs: 3600000
