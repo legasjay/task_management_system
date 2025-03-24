@@ -3,6 +3,8 @@ package com.olegandreevich.tms.dto;
 import com.olegandreevich.tms.entities.enums.Priority;
 import com.olegandreevich.tms.entities.enums.Status;
 
+import java.util.Objects;
+
 public class TaskDTOGet {
     private Long id;
     private String title;
@@ -80,5 +82,24 @@ public class TaskDTOGet {
 
     public void setAssigneeId(Long assigneeId) {
         this.assigneeId = assigneeId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TaskDTOGet that = (TaskDTOGet) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(description, that.description) &&
+                status == that.status &&
+                priority == that.priority &&
+                Objects.equals(authorId, that.authorId) &&
+                Objects.equals(assigneeId, that.assigneeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, status, priority, authorId, assigneeId);
     }
 }
