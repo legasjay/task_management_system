@@ -46,7 +46,7 @@ create TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    status VARCHAR(20) NOT NULL CHECK (priority IN ('PENDING', 'IN_PROGRESS', 'COMPLETED')),
+    status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'IN_PROGRESS', 'COMPLETED')),
     priority VARCHAR(20) NOT NULL CHECK (priority IN ('HIGH', 'MEDIUM', 'LOW')),
     author_id BIGINT,
     assignee_id BIGINT,
@@ -73,14 +73,14 @@ values (2, 'user1@example.com', 'user1', 'admin', 'USER');
 insert into users (id, email, username, password, role)
 values (3, 'user2@example.com', 'user2', 'admin', 'USER');
 
---INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (1, 'Задача 1', 'Описание первой задачи', 'PENDING', 'HIGH', 1, 2);
---INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (2, 'Задача 2', 'Описание второй задачи', 'COMPLETED', 'LOW', 2, 3);
---INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (3, 'Задача 3', 'Описание третьей задачи', 'IN_PROGRESS', 'MEDIUM', 3, 1);
---INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (4, 'Задача 4', 'Описание четвертой задачи', 'PENDING', 'HIGH', 1, 2);
---INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (5, 'Задача 5', 'Описание пятой задачи', 'COMPLETED', 'LOW', 3, 1);
---
---INSERT INTO comments (id, content, task_id, user_id) VALUES (1, 'Первый комментарий к задаче 1', 1, 1);
---INSERT INTO comments (id, content, task_id, user_id) VALUES (2, 'Второй комментарий к задаче 1', 1, 2);
---INSERT INTO comments (id, content, task_id, user_id) VALUES (3, 'Третий комментарий к задаче 1', 1, 3);
---INSERT INTO comments (id, content, task_id, user_id) VALUES (4, 'Четвертый комментарий к задаче 2', 2, 1);
---INSERT INTO comments (id, content, task_id, user_id) VALUES (5, 'Пятый комментарий к задаче 2', 2, 2);
+INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (1, 'Задача 1', 'Описание первой задачи', 'PENDING', 'HIGH', 1, 2);
+INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (2, 'Задача 2', 'Описание второй задачи', 'COMPLETED', 'LOW', 2, 3);
+INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (3, 'Задача 3', 'Описание третьей задачи', 'IN_PROGRESS', 'MEDIUM', 3, 1);
+INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (4, 'Задача 4', 'Описание четвертой задачи', 'PENDING', 'HIGH', 1, 2);
+INSERT INTO tasks (id, title, description, status, priority, author_id, assignee_id) VALUES (5, 'Задача 5', 'Описание пятой задачи', 'COMPLETED', 'LOW', 3, 1);
+
+INSERT INTO comments (id, content, task_id, user_id) VALUES (1, 'Первый комментарий к задаче 1', 1, 1);
+INSERT INTO comments (id, content, task_id, user_id) VALUES (2, 'Второй комментарий к задаче 1', 1, 2);
+INSERT INTO comments (id, content, task_id, user_id) VALUES (3, 'Третий комментарий к задаче 1', 1, 3);
+INSERT INTO comments (id, content, task_id, user_id) VALUES (4, 'Четвертый комментарий к задаче 2', 2, 1);
+INSERT INTO comments (id, content, task_id, user_id) VALUES (5, 'Пятый комментарий к задаче 2', 2, 2);
