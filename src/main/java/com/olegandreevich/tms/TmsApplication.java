@@ -16,7 +16,7 @@ public class TmsApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 
 		SpringApplication.run(TmsApplication.class, args);
-		String plainTextPassword = "admin"; // Ваш пароль
+		String plainTextPassword = "admin";
 
 
 	}
@@ -24,8 +24,10 @@ public class TmsApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		try {
-			String plainTextPassword = "admin"; // Ваш новый пароль
+			String plainTextPassword = "admin";
 			userService.updatePassword("admin", plainTextPassword);
+			userService.updatePassword("user1", plainTextPassword);
+			userService.updatePassword("user2", plainTextPassword);
 			System.out.println("Пароль успешно обновлён!");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

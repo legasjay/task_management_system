@@ -21,6 +21,7 @@
 #        security:
 #          JwtAuthenticationFilter: DEBUG
 
+# Для запуска в k8s
 app:
   jwtSecret: 'my_secret_key'
   jwtExpirationInMs: 3600000

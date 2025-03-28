@@ -4,7 +4,7 @@
 4. Тестирование: протестировать можно в интерфейсе swagger-ui. Методы контроллера имеют интуитивно понятные названия для понимания. Также добавлены юнит тесты для классов TaskController.java и TaskService.java.
 
 5. Начиная с ветки 16 добавлено развертывание в kubernetes. Должен быть установлен kind, kubectl. 
-6. Создаем кластер "kind create cluster". 
+6. Пересобираем проект "./gradlew clean build -x test". Создаем кластер "kind create cluster". 
 7. Собираем докер образ "docker build -t my-app:v1 ."  . 
 8. Применяем конфиг файлы к8с командой "kubectl apply -f k8s/app-deployment.yaml" "kubectl apply -f k8s/ingress.yaml" "kubectl apply -f k8s/postgres-deployment.yaml". 
 9. Пишем команду "kind load docker-image my-app:v1". 

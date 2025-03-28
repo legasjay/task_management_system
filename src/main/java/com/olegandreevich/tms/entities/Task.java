@@ -1,5 +1,7 @@
 package com.olegandreevich.tms.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.olegandreevich.tms.entities.enums.Priority;
 import com.olegandreevich.tms.entities.enums.Status;
 import jakarta.persistence.*;
@@ -10,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "tasks")
-
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +36,12 @@ public class Task {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
+    @JsonIgnore
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
+    @JsonIgnore
     private User assignee;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)

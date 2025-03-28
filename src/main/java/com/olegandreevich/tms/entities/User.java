@@ -1,8 +1,11 @@
 package com.olegandreevich.tms.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.olegandreevich.tms.entities.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
+
 import java.util.Set;
 
 @Entity
@@ -29,9 +32,11 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "author")
+    @JsonIgnore
     private Set<Task> tasksAsAuthor;
 
     @OneToMany(mappedBy = "assignee")
+    @JsonIgnore
     private Set<Task> tasksAsAssignee;
 
 
