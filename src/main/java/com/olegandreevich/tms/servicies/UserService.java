@@ -10,6 +10,7 @@ import com.olegandreevich.tms.util.exceptions.ResourceNotFoundException;
 import com.olegandreevich.tms.util.exceptions.UsernameAlreadyExistsException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserCheckService userCheckService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserCheckService userCheckService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userCheckService = userCheckService;
     }
 
     /** * Регистрирует нового пользователя. * * @param dto Объект регистрации пользователя.
@@ -63,6 +66,9 @@ public class UserService {
 
     /** * Возвращает список всех пользователей. * * @return Список всех пользователей. */
     public List<User> findAll() {
+        if (!userCheckService.isAdmin()) {
+            throw new AccessDeniedException("У вас нет прав для получения всех пользователей.");
+        }
         return userRepository.findAll();
     }
 
